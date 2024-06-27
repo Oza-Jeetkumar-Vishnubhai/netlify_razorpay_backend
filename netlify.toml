@@ -4,5 +4,5 @@
 
 [[redirects]]
   to = "/"
-  frpm = "/.netlify/functions/server"
+  from = "/.netlify/functions/server"
   status = 200
