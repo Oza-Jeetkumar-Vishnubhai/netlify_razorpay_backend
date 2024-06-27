@@ -1,7 +1,8 @@
 [build]
-    functions="functions"
+    functions = "functions"
+    node_bundler = "esbuild"
 
 [[redirects]]
-  from = "/"
-  to = "/.netlify/functions/server"
+  to = "/"
+  frpm = "/.netlify/functions/server"
   status = 200

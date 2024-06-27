@@ -1,7 +1,7 @@
 // server/api/create-subscription.js (example using Express)
 const express = require("express");
 const Razorpay = require("razorpay");
-const serverless = require("serverless-http")
+const ServerlessHttp = require("serverless-http")
 const app = express();
 const crypto = require("crypto");
 const port = 3000;
@@ -12,14 +12,13 @@ require("dotenv").config();
 app.use(express.json());
 app.use(cors({ credentials: true, origin: true }));
 
-const router = express.Router();
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
   key_secret: process.env.RAZORPAY_KEY_SECRET,
 });
 
-router.get("/", (req, res) => {
+app.get("/", (req, res) => {
   try{
   console.log("site is live")
   res.json({ message: "Hello from express" });
@@ -28,7 +27,7 @@ router.get("/", (req, res) => {
   }
 });
 
-router.post("/create-subscription", async (req, res) => {
+app.post("/create-subscription", async (req, res) => {
   const { planId,total_count,customer_notify } = req.body;
   console.log(planId);
   console.log("req body : ", req.body);
@@ -45,7 +44,7 @@ router.post("/create-subscription", async (req, res) => {
   }
 });
 
-router.get("/allPlans", async (req, res) => {
+app.get("/allPlans", async (req, res) => {
   try {
     const plans = await razorpay.plans.all();
     res.json(plans);
@@ -54,7 +53,7 @@ router.get("/allPlans", async (req, res) => {
   }
 });
 
-router.post("/getSubDetails", async (req, res) => {
+app.post("/getSubDetails", async (req, res) => {
   const { id } = req.body;
   try {
     const subDetail = await razorpay.subscriptions.fetch(id);
@@ -64,7 +63,7 @@ router.post("/getSubDetails", async (req, res) => {
   }
 });
 
-router.post("/verification/", async (req, res) => {
+app.post("/verification/", async (req, res) => {
   try {
     const crypt = crypto.createHmac("sha256", razorpay.key_secret);
     crypt.update(req.body.razorpay_payment_id + "|" + req.body.sid);
@@ -79,7 +78,7 @@ router.post("/verification/", async (req, res) => {
   }
 });
 
-router.post("/getPlansById", async(req, res) => {
+app.post("/getPlansById", async(req, res) => {
   const {id} = req.body;
   try {
       const planDetail = await razorpay.plans.fetch(id)
@@ -91,7 +90,12 @@ router.post("/getPlansById", async(req, res) => {
 
 app.use('/.netlify/functions/server', router);
 
-module.exports.handler = serverless(app)
+const handler = ServerlessHttp(app);
+
+module.exports.handler = async(event, context) => {
+    const result = await handler(event, context);
+    return result;
+}
 
 // app.listen(port, () => {
 //   console.log(`Server is running on http://localhost:${port}`);
