@@ -88,7 +88,7 @@ app.post("/getPlansById", async(req, res) => {
   }
 });
 
-app.use('/.netlify/functions/server', router);
+// app.use('/.netlify/functions/server', router);
 
 const handler = ServerlessHttp(app);
 
